@@ -1,10 +1,8 @@
-import moment from "moment";
-
 export default class InMemoryStorage {
     static #storage = {};
 
     static set(key, value, ttl) {
-        this.#storage[key] = this.#buildStorageObject(value, ttl)
+        this.#storage[key] = this.#buildStorageObject(value, ttl);
     }
 
     static get(key) {
@@ -14,7 +12,7 @@ export default class InMemoryStorage {
             return null;
         }
 
-        const currentTimestamp = moment().unix();
+        const currentTimestamp = Math.floor(Date.now() / 1000);
 
         if (cacheStoredElement['valid_until'] < currentTimestamp) {
             delete this.#storage[key];
@@ -25,12 +23,12 @@ export default class InMemoryStorage {
     }
 
     static #buildStorageObject(value, ttl) {
-        const currentDate = moment();
+        const currentDate = new Date();
+        const validUntil = new Date(currentDate.getTime() + ttl * 1000);
 
         return {
             'value': value,
-            'valid_until': currentDate.add(ttl, 'seconds').unix()
-        }
+            'valid_until': Math.floor(validUntil.getTime() / 1000)
+        };
     }
 }
-
